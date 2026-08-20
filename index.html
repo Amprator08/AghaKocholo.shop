@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#070707">
+<title>AghaKocholo.VPNS | سرویس پرسرعت</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap');
+
+:root{
+  --gold:#d7a900;
+  --gold2:#f0c329;
+  --gold-soft:rgba(215,169,0,.15);
+  --gold-border:rgba(215,169,0,.3);
+  --black:#070707;
+  --panel:#0e0e0f;
+  --line:rgba(255,255,255,.09);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; width:100%; overflow-x:hidden; }
+
+body{
+    width:100%;
+    overflow-x:hidden;
+    font-family:"Vazirmatn",sans-serif !important;
+    background:#070707 !important;
+    color:#fff;
+    line-height:1.7;
+}
+
+img{ max-width:100%; height:auto; }
+button, input, select{ font-family:inherit; }
+
+@keyframes slideDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes floatAnim {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+@keyframes glowBorder {
+    0%, 100% { border-color: var(--gold-border); box-shadow: 0 0 10px rgba(240,195,41,0.1); }
+    50% { border-color: var(--gold2); box-shadow: 0 0 25px rgba(240,195,41,0.3); }
+}
+
+@keyframes pulseAnim {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(240,195,41, 0.4); }
+    70% { transform: scale(1.02); box-shadow: 0 0 0 12px rgba(240,195,41, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(240,195,41, 0); }
+}
+
+/* هدر */
+header{
+    position:sticky; top:0; z-index:5000; width:100%;
+    background:rgba(7,7,7,.85); backdrop-filter:blur(15px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+.navbar{
+    max-width:1120px; min-height:64px; margin:auto; padding:10px 15px;
+    display:flex; align-items:center; justify-content:space-between;
+}
+.version-badge{
+    font-size:11px; font-weight:800; padding:4px 10px; border-radius:8px;
+    background:var(--gold-soft); color:var(--gold2); border:1px solid var(--gold-border);
+    animation: floatAnim 3s ease-in-out infinite;
+}
+.nav-links{ display:flex; align-items:center; gap:5px; list-style:none; }
+.nav-links a{
+    color:#aaa; text-decoration:none; padding:8px 12px; border-radius:8px; font-size:12px; transition:all 0.3s; cursor: pointer;
+}
+.nav-links a:hover{ color:#fff; background:var(--gold-soft); transform: translateY(-2px); }
+
+/* انیمیشن دکمه منو */
+.menu-btn{
+    display:none; width:42px; height:42px; background:#111; border:1px solid var(--line);
+    border-radius:10px; color:var(--gold2); font-size:18px; cursor:pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.menu-btn:hover { background:var(--gold-soft); border-color:var(--gold-border); transform: rotate(90deg) scale(1.05); }
+
+.mobile-menu{ display:none; background:rgba(7,7,7,.98); padding:0 15px; max-height:0; overflow:hidden; transition:all 0.4s ease-in-out; }
+.mobile-menu.active{ display:block; max-height:450px; padding:10px 15px 20px; }
+.mobile-menu a{ display:block; color:#ddd; text-decoration:none; padding:12px; margin-top:5px; border-radius:8px; background:rgba(255,255,255,.04); font-size:13px; cursor: pointer; transition: 0.2s; }
+.mobile-menu a:active { transform: scale(0.97); background: var(--gold-soft); }
+
+/* مودال خوش‌آمدگویی */
+.welcome-notice{
+    position:fixed; inset:0; width:100%; height:100%; z-index:99999;
+    display:flex; align-items:center; justify-content:center; padding:15px;
+    background:rgba(0,0,0,.88); backdrop-filter:blur(15px);
+}
+.notice-box{
+    width:100%; max-width:440px; padding:25px; text-align:center; border-radius:20px;
+    background:#0b0b0c; border:1px solid var(--gold-border);
+    box-shadow:0 25px 60px rgba(0,0,0,.8);
+}
+.notice-icon{ font-size:32px; margin-bottom:10px; animation: floatAnim 2s infinite ease-in-out; }
+.notice-box h2{ font-size:20px; margin-bottom:10px; color:#fff; }
+.notice-text{ color:#999; font-size:11px; line-height:2.1; margin-bottom:20px; }
+.notice-close{
+    width:100%; min-height:48px; border:0; border-radius:12px;
+    color:#777; background:#191919; font-size:12px; font-weight:bold; cursor:not-allowed; transition: 0.3s;
+}
+.notice-close.active{ color:#111; cursor:pointer; background:linear-gradient(135deg,var(--gold2),#c99e00); animation: glowBorder 2s infinite; }
+.notice-countdown{ display:block; margin-top:8px; color:#666; font-size:9px; }
+
+/* مدیریت صفحات SPA */
+.page-view { display: none; width: 100%; }
+.page-view.active-page { display: block !important; }
+
+main{ width:100%; overflow:hidden; }
+section{ width:100%; max-width:1120px; margin:auto; padding:45px 15px; }
+
+.section-title{ text-align:center; margin-bottom:25px; }
+.section-title span{ color:var(--gold2); font-size:11px; font-weight:700; letter-spacing: 2px; }
+.section-title h2{ font-size:clamp(22px,6vw,32px); color:#fff; margin-top:5px; position:relative; display:inline-block; }
+.section-title h2::after{ content:''; position:absolute; bottom:-6px; left:50%; transform:translateX(-50%); width:40px; height:2px; background:var(--gold2); border-radius:2px; }
+
+/* دکمه‌ها با انیمیشن‌های جذاب */
+.btn{
+    min-height:46px; display:inline-flex; align-items:center; justify-content:center;
+    padding:10px 20px; border-radius:12px; border:0; text-decoration:none;
+    font-size:13px; font-weight:bold; cursor:pointer; transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); gap:8px;
+}
+.btn-primary{
+    background:linear-gradient(135deg,var(--gold2),#c99d00) !important;
+    color:#111 !important;
+    box-shadow: 0 4px 15px rgba(240,195,41,0.3);
+    animation: pulseAnim 3s infinite;
+}
+.btn-primary:hover{ filter:brightness(1.15); transform:translateY(-3px) scale(1.02); box-shadow: 0 6px 20px rgba(240,195,41,0.5); }
+.btn-primary:active { transform: translateY(1px) scale(0.98); }
+
+.btn-secondary{ color:#fff; background:#111; border:1px solid var(--line); }
+.btn-secondary:hover{ border-color:var(--gold-border); background:rgba(255,255,255,0.06); transform: translateY(-2px); }
+
+.btn-rubika{ background:#3949ab !important; color:#fff !important; transition: all 0.3s; }
+.btn-rubika:hover { filter: brightness(1.15); transform: translateY(-3px) scale(1.02); box-shadow: 0 6px 20px rgba(57,73,171,0.4); }
+
+/* هیرو */
+.hero{ min-height:calc(80vh - 64px); display:flex; align-items:center; justify-content:center; text-align:center; }
+.hero-content{ max-width:750px; }
+.hero-badge{ display:inline-block; padding:6px 14px; margin-bottom:15px; border-radius:30px; color:#36d889; background:rgba(54,216,137,.06); border:1px solid rgba(54,216,137,.2); font-size:11px; }
+.hero h1{ font-size:clamp(28px,7vw,55px); background:linear-gradient(90deg,#fff 20%,var(--gold2) 80%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.hero p{ color:#888; font-size:13px; margin:15px auto; line-height:1.9; }
+.hero-buttons{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:20px; }
+
+/* وضعیت زنده */
+.live-status{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.status-card{ padding:16px 10px; text-align:center; border-radius:16px; background:rgba(255,255,255,.03); border:1px solid var(--line); }
+.pulse-dot{ display:inline-block; width:8px; height:8px; background:#00ff88; border-radius:50%; animation:pulse 2s infinite; }
+@keyframes pulse { 0%{transform:scale(0.95);box-shadow:0 0 0 0 rgba(0,255,136,0.7);} 70%{transform:scale(1);box-shadow:0 0 0 8px rgba(0,255,136,0); } 100%{transform:scale(0.95);box-shadow:0 0 0 0 rgba(0,255,136,0);} }
+
+/* تست سرعت */
+.speedtest-container{
+    max-width:650px; margin:auto; padding:30px 20px; border-radius:24px;
+    background:rgba(255,255,255,.025); border:1px solid var(--line); text-align:center;
+}
+.speed-gauge-box{
+    position:relative; width:200px; height:200px; margin:25px auto;
+    border-radius:50%; background:radial-gradient(circle, rgba(240,195,41,0.05) 0%, rgba(0,0,0,0.7) 80%);
+    border:4px solid var(--gold-border); display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.speed-gauge-box.testing{ animation: glowBorder 1.5s infinite; }
+.gauge-needle {
+    position: absolute; bottom: 50%; left: 50%; width: 4px; height: 75px;
+    background: linear-gradient(to top, transparent, var(--gold2));
+    transform-origin: bottom center; transform: rotate(-90deg);
+    transition: transform 0.1s linear; border-radius: 4px;
+}
+.gauge-center-dot { position: absolute; width: 12px; height: 12px; background: var(--gold2); border-radius: 50%; bottom: calc(50% - 6px); z-index: 2; }
+.speed-value{ font-size:36px; font-weight:900; color:var(--gold2); z-index: 3; margin-top: 15px; }
+.speed-unit{ font-size:10px; color:#888; z-index: 3; }
+.speed-metrics{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:20px 0; }
+.metric-box{ padding:12px; border-radius:12px; background:rgba(0,0,0,0.3); border:1px solid var(--line); font-size:11px; color:#888; }
+.metric-box span{ display:block; font-size:13px; font-weight:bold; color:#fff; margin-top:4px; }
+
+/* خرید سریع */
+.quick-buy{ padding:25px; border-radius:20px; background:rgba(255,255,255,.025); border:1px solid var(--line); }
+.buy-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:15px; }
+.form-group label{ display:block; color:#bbb; margin-bottom:8px; font-size:12px; }
+select{ width:100%; min-height:46px; padding:10px; border-radius:10px; background:#111; color:#fff; border:1px solid var(--line); outline:none; font-size:12px; cursor: pointer; }
+.location-warning{ margin-top:8px; padding:8px; border-radius:8px; color:#ffc107; background:rgba(255,193,7,.05); font-size:10px; }
+.volume-box{ padding:15px; border-radius:12px; background:rgba(0,0,0,.3); border: 1px solid var(--line); }
+input[type="range"]{ width:100%; height:6px; accent-color:var(--gold2); cursor:pointer; margin:10px 0; }
+.price-result{ margin-top:20px; padding:20px; text-align:center; border-radius:14px; background:rgba(0,0,0,.4); border:1px solid var(--line); }
+.order-summary{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:15px; font-size:10px; color:#888; }
+.order-summary strong{ display:block; color:#fff; font-size:11px; margin-top:3px; }
+.final-price{ color:var(--gold2); font-size:24px; font-weight:900; margin:5px 0 15px; }
+
+/* قیمت‌ها و لوکیشن‌ها */
+.pricing{ display:grid; grid-template-columns:repeat(2,1fr); gap:15px; }
+.price-box{ padding:20px; border-radius:16px; background:rgba(255,255,255,.03); border:1px solid var(--line); }
+.price-title{ display:flex; align-items:center; gap:10px; margin-bottom:15px; font-size:16px; }
+.price-item{ display:flex; justify-content:space-between; padding:10px; margin-bottom:6px; border-radius:8px; background:rgba(0,0,0,.2); font-size:11px; }
+
+.location-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+.location-card{ padding:15px 5px; text-align:center; border-radius:14px; background:rgba(255,255,255,.03); border:1px solid var(--line); }
+.flag{ font-size:28px; margin-bottom:5px; }
+
+.tutorial-card{ max-width:650px; margin:auto; padding:20px; border-radius:18px; background:rgba(255,255,255,.03); border:1px solid var(--line); text-align:center; }
+.video-container{ width:100%; border-radius:12px; overflow:hidden; border:1px solid var(--gold-border); margin-top:15px; background:#000; }
+video{ width:100%; display:block; }
+
+.faq{ max-width:800px; margin:auto; }
+
+details{
+    padding:14px 16px; margin-bottom:10px; border-radius:12px;
+    background:rgba(255,255,255,.03); border:1px solid var(--line);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+details:hover {
+    border-color: var(--gold-border);
+    background: rgba(215, 169, 0, 0.03);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+summary{
+    cursor:pointer; font-size:12px; font-weight:bold; color:#ddd;
+    list-style: none; display: flex; align-items: center; justify-content: space-between;
+    transition: color 0.3s;
+}
+summary::-webkit-details-marker { display: none; }
+summary::after {
+    content: '+'; font-size: 16px; color: var(--gold2); font-weight: 900;
+    transition: transform 0.3s ease;
+}
+details[open] summary::after { transform: rotate(45deg); }
+details[open] summary { color: var(--gold2); }
+details p{ color:#999; font-size:11px; margin-top:12px; line-height:1.9; padding-top: 8px; border-top: 1px solid var(--line); }
+
+.contact-card{ max-width:650px; margin:auto; padding:25px; text-align:center; border-radius:20px; background:linear-gradient(145deg,rgba(215,169,0,.05),rgba(57,73,171,.05)); border:1px solid var(--line); }
+.contact-btns{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:15px; }
+
+footer{ padding:20px; text-align:center; color:#666; border-top:1px solid var(--line); font-size:10px; }
+
+/* دکمه‌های شناور */
+.floating-btn {
+    position: fixed; bottom: 20px; width: 42px; height: 42px;
+    background: var(--gold2); color: #111; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-weight: bold; z-index: 4999;
+    box-shadow: 0 5px 15px rgba(215,169,0,.3);
+    transition: all 0.3s;
+}
+.floating-btn:hover { transform: scale(1.1); }
+#scrollToTop { left: 20px; opacity: 0; visibility: hidden; }
+#scrollToTop.show { opacity: 1; visibility: visible; }
+#speedtestFloatBtn { right: 20px; font-size: 18px; }
+
+/* مودال */
+.modal{ position:fixed; inset:0; z-index:9998; display:none; align-items:center; justify-content:center; padding:15px; background:rgba(0,0,0,.85); backdrop-filter:blur(8px); }
+.modal.active{ display:flex; }
+.modal-box{ width:100%; max-width:540px; padding:20px; border-radius:18px; background:#0c0c12; border:1px solid var(--gold-border); max-height: 90vh; overflow-y: auto; }
+.modal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.close-modal{ width:35px; height:35px; border:0; border-radius:8px; background:rgba(255,255,255,.06); color:#fff; font-size:18px; cursor:pointer; transition: 0.2s; }
+.close-modal:hover { background: rgba(255,0,0,0.2); color: #ff4d4d; }
+.order-alert{ padding:10px; border-radius:10px; background:rgba(215,169,0,.06); font-size:11px; color:#ddd; margin-bottom:10px; line-height:1.8; }
+.copy-text{ width:100%; height:180px; padding:10px; resize:none; border-radius:10px; background:#050508; color:#ddd; border:1px solid var(--line); font-size:11px; outline: none; }
+.modal-actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+
+@media(max-width:900px){
+    .nav-links{ display:none; }
+    .menu-btn{ display:block; }
+    .buy-grid{ grid-template-columns:1fr; }
+    .location-grid{ grid-template-columns:repeat(3,1fr); }
+}
+@media(max-width:600px){
+    .pricing{ grid-template-columns:1fr; }
+    .location-grid{ grid-template-columns:repeat(2,1fr); }
+    .order-summary{ grid-template-columns:1fr 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- خوش‌آمدگویی -->
+<div class="welcome-notice" id="welcomeNotice">
+<div class="notice-box">
+<div class="notice-icon">👋</div>
+<h2>خوش آمدید!</h2>
+<div class="notice-text">
+دوست عزیز، لطفاً پیش از خرید حتماً نگاهی به بخش <strong>سوالات متداول</strong> بیندازید تا راهنمایی لازم را دریافت کنید. ⚡
+</div>
+<button class="notice-close" id="noticeClose" disabled>⏳ لطفاً ۵ ثانیه صبر کنید...</button>
+<span class="notice-countdown" id="noticeCountdown">دکمه بستن تا ۵ ثانیه دیگر فعال می‌شود</span>
+</div>
+</div>
+
+<!-- هدر -->
+<header>
+<nav class="navbar">
+<div class="version-badge">v2.9 PRO 🌟</div>
+<ul class="nav-links">
+<li><a onclick="switchPage('home-page')">🏠 خانه</a></li>
+<li><a onclick="switchPage('speedtest-page')">⚡ تست سرعت</a></li>
+<li><a onclick="switchPage('home-page'); location.hash='quick-buy';">🛒 خرید سریع</a></li>
+<li><a onclick="switchPage('home-page'); location.hash='pricing';">💎 قیمت‌ها</a></li>
+<li><a onclick="switchPage('home-page'); location.hash='tutorial';">📱 آموزش</a></li>
+<li><a onclick="switchPage('home-page'); location.hash='faq';">❓ سوالات</a></li>
+<li><a onclick="switchPage('home-page'); location.hash='contact';">💬 پشتیبانی</a></li>
+</ul>
+<button class="menu-btn" onclick="toggleMenu()" title="منو">☰</button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+<a onclick="switchPage('home-page')">🏠 خانه</a>
+<a onclick="switchPage('speedtest-page')">⚡ تست سرعت</a>
+<a onclick="switchPage('home-page'); location.hash='quick-buy';">🛒 خرید سریع</a>
+<a onclick="switchPage('home-page'); location.hash='pricing';">💎 قیمت‌ها</a>
+<a onclick="switchPage('home-page'); location.hash='tutorial';">📱 آموزش</a>
+<a onclick="switchPage('home-page'); location.hash='faq';">❓ سوالات متداول</a>
+<a onclick="switchPage('home-page'); location.hash='contact';">💬 پشتیبانی</a>
+</div>
+</header>
+
+<!-- 🏠 صفحه اصلی سایت -->
+<div id="home-page" class="page-view active-page">
+<main>
+<section class="hero">
+<div class="hero-content">
+<div class="hero-badge">🟢 سرویس‌ها پایدار و پرسرعت 🚀</div>
+<h1>AghaKocholo.VPNS</h1>
+<p>سرویس‌های پرسرعت با پایداری عالی و اتصال آنی. ⚡<br>حجم و لوکیشن خود را انتخاب کنید و سفارش دهید. 💎</p>
+<div class="hero-buttons">
+<a href="#quick-buy" class="btn btn-primary">🛒 خرید سریع</a>
+<a onclick="switchPage('speedtest-page')" class="btn btn-secondary">⚡ تست سرعت آنلاین</a>
+</div>
+</div>
+</section>
+
+<section>
+<div class="section-title">
+<span>LIVE STATUS</span>
+<h2>وضعیت سرویس‌ها 🌐</h2>
+</div>
+<div class="live-status">
+<div class="status-card">
+<div style="font-size:22px;">🟢</div>
+<div style="font-size:11px; color:#aaa; margin:4px 0;">وضعیت <span class="pulse-dot"></span></div>
+<div style="font-weight:900; color:#00ff88;">آنلاین 🔥</div>
+</div>
+<div class="status-card">
+<div style="font-size:22px;">👥</div>
+<div style="font-size:11px; color:#aaa; margin:4px 0;">کاربران</div>
+<div style="font-weight:900; color:#c77dff;">۱۵ نفر 🌟</div>
+</div>
+<div class="status-card">
+<div style="font-size:22px;">⚡</div>
+<div style="font-size:11px; color:#aaa; margin:4px 0;">سرعت میانگین</div>
+<div style="font-weight:900; color:var(--gold2);">+۵۰ مگابیت 🚀</div>
+</div>
+</div>
+</section>
+
+<section id="quick-buy">
+<div class="section-title">
+<span>QUICK BUY</span>
+<h2>🛒 خرید سریع و آسان</h2>
+</div>
+<div class="quick-buy">
+<div class="buy-grid">
+<div class="form-group">
+<label>💎 نوع پلن</label>
+<select id="service">
+<option value="diamond">💎 پلن الماس (اینترنت عادی)</option>
+<option value="gold">👑 پلن طلایی (اینترنت ملی)</option>
+</select>
+</div>
+<div class="form-group">
+<label>🌍 لوکیشن</label>
+<select id="location"></select>
+<div class="location-warning" id="locationWarning">⚠️ هزینه لوکیشن: رایگان</div>
+</div>
+<div class="form-group">
+<label>📦 حجم انتخابی</label>
+<div class="volume-box">
+<div style="display:flex; justify-content:space-between; font-size:11px; color:#aaa;">
+<span>حجم: <strong id="volumeNumber" style="color:var(--gold2); font-size:15px;">۵</strong> گیگ</span>
+</div>
+<input type="range" id="volumeSlider" min="1" max="50" value="5">
+</div>
+</div>
+</div>
+
+<div class="price-result">
+<div class="order-summary">
+<div>پلن:<strong id="selectedService">الماس</strong></div>
+<div>لوکیشن:<strong id="selectedLocation">ترکیه</strong></div>
+<div>حجم:<strong id="selectedVolume">۵ گیگابایت</strong></div>
+</div>
+<div style="font-size:11px; color:#888;">مبلغ قابل پرداخت</div>
+<div class="final-price" id="finalPrice">۲۰,۰۰۰ تومان</div>
+<button class="btn btn-primary" onclick="openOrderModal()">🛒 ثبت و دریافت فاکتور خرید ✨</button>
+</div>
+</div>
+</section>
+
+<section id="pricing">
+<div class="section-title">
+<span>PRICING</span>
+<h2>💎 تعرفه قیمت‌ها</h2>
+</div>
+<div class="pricing">
+<div class="price-box">
+<div class="price-title">💎 پلن الماس</div>
+<div class="price-item"><span>۵ گیگابایت</span><span style="color:var(--gold2);">۲۰,۰۰۰ تومان</span></div>
+<div class="price-item"><span>۱۰ گیگابایت</span><span style="color:var(--gold2);">۴۰,۰۰۰ تومان</span></div>
+<div class="price-item"><span>۲۰ گیگابایت</span><span style="color:var(--gold2);">۸۰,۰۰۰ تومان</span></div>
+</div>
+<div class="price-box">
+<div class="price-title">👑 پلن طلایی</div>
+<div class="price-item"><span>۵ گیگابایت</span><span style="color:#ffc107;">۵۰۰,۰۰۰ تومان</span></div>
+<div class="price-item"><span>۱۰ گیگابایت</span><span style="color:#ffc107;">۱,۰۰۰,۰۰۰ تومان</span></div>
+<div class="price-item"><span>۲۰ گیگابایت</span><span style="color:#ffc107;">۲,۰۰۰,۰۰۰ تومان</span></div>
+</div>
+</div>
+</section>
+
+<section>
+<div class="section-title">
+<span>LOCATIONS</span>
+<h2>لوکیشن‌های سرور 🌍</h2>
+</div>
+<div class="location-grid">
+<div class="location-card"><div class="flag">🇹🇷</div><div style="font-size:12px; font-weight:bold;">ترکیه</div><div style="font-size:9px; color:#aaa;">رایگان ✨</div></div>
+<div class="location-card"><div class="flag">🇩🇪</div><div style="font-size:12px; font-weight:bold;">آلمان</div><div style="font-size:9px; color:#aaa;">رایگان ✨</div></div>
+<div class="location-card"><div class="flag">🇳🇱</div><div style="font-size:12px; font-weight:bold;">هلند</div><div style="font-size:9px; color:#aaa;">+۱هزار / گیگ</div></div>
+<div class="location-card"><div class="flag">🇫🇮</div><div style="font-size:12px; font-weight:bold;">فنلاند</div><div style="font-size:9px; color:#aaa;">+۲هزار / گیگ</div></div>
+<div class="location-card"><div class="flag">🇺🇸</div><div style="font-size:12px; font-weight:bold;">آمریکا</div><div style="font-size:9px; color:#aaa;">+۵هزار / گیگ</div></div>
+</div>
+</section>
+
+<section id="tutorial">
+<div class="section-title">
+<span>GUIDE</span>
+<h2>📱 آموزش ویدیویی اتصال</h2>
+</div>
+<div class="tutorial-card">
+<div style="font-size:14px; font-weight:bold; color:var(--gold2);">نحوه اتصال به کانفیگ‌ها 🎬</div>
+<div class="video-container">
+<video controls>
+<source src="https://abrehamrahi.ir/o/public/3LVX6qSu/" type="video/mp4">
+مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
+</video>
+</div>
+</div>
+</section>
+
+<section id="faq">
+<div class="section-title">
+<span>FAQ</span>
+<h2>❓ سوالات متداول</h2>
+</div>
+<div class="faq">
+<details>
+<summary>چطوری بعد از واریز وجه، کانفیگ رو تحویل بگیرم؟ 📦🚀</summary>
+<p>بعد از انجام سفارش و کارت به کارت، ادمین‌های ما در کمترین زمان ممکن (بین ۵ تا ۳ ساعت) اشتراک شما را ارسال می‌کنند. ✨</p>
+</details>
+<details>
+<summary>سرویس روی چه دستگاه‌ها و برنامه‌هایی کار می‌کند؟ 📱💻</summary>
+<p>کانفیگ‌های ما کاملاً تست‌شده و پایدار هستند و به راحتی روی تمام سیستم‌عامل‌ها با برنامه‌های استاندارد زیر کار می‌کنند:<br>
+🤖 اندروید: V2RayNG<br>
+🍏 آیفون و آیپد: NapsternetV یا Streisand<br>
+💻 ویندوز و کامپیوتر: v2rayN یا NekoBox</p>
+</details>
+<details>
+<summary>اگر حجم سرویس تمام شود یا سرعت افت کند چه کار کنیم؟ 🔄🔋</summary>
+<p>نگران نباش! هر زمان که حجمت تموم بشه می‌تونی خیلی راحت از طریق بخش خرید سریع سایت یا ارتباط مستقیم با پشتیبانی، حجم دلخواهت رو تمدید کنی. 🌟✨ و اگر هم با مشکل افت سرعت مواجه شدی می‌تونی با ارسال مدرک از افت سرعت، پول حجمی که از اشتراکت مونده رو پس بگیری. 🛡️</p>
+</details>
+<details>
+<summary>چرا نیاز است با VPN وارد تلگرام پشتیبانی شویم؟ ✈️🌐</summary>
+<p>متأسفانه برنامه Telegram توی کشور ایران فیلتر است و نیاز به VPN دارد تا برنامه کار کند. 🚀</p>
+</details>
+</div>
+</section>
+
+<section id="contact">
+<div class="contact-card">
+<h2>💬 ارتباط با پشتیبانی</h2>
+<p style="color:#aaa; font-size:11px; margin-top:8px;">برای ثبت سفارش یا سوالات، از راه‌های زیر با ما در ارتباط باشید. 🌟</p>
+<div class="contact-btns">
+<a href="https://t.me/Game94mod000" target="_blank" rel="noopener" class="btn btn-primary">
+✈️ خرید از تلگرام [با VPN وارد شوید]
+</a>
+<a href="https://rubika.ir/" target="_blank" rel="noopener" class="btn btn-rubika">
+💬 پشتیبانی در روبیکا
+</a>
+</div>
+</div>
+</section>
+</main>
+<footer>
+<p>© 2026 تمامی حقوق برای AghaKocholo.VPNS محفوظ است. 🌟</p>
+</footer>
+</div>
+
+<!-- ⚡ صفحه اختصاصی تست سرعت -->
+<div id="speedtest-page" class="page-view">
+<main>
+<section style="min-height:85vh; display:flex; flex-direction:column; justify-content:center;">
+<div style="text-align:center; margin-bottom: 20px;">
+<button class="btn btn-secondary" onclick="switchPage('home-page')">🏠 بازگشت به صفحه اصلی</button>
+</div>
+
+<div class="section-title">
+<span>SPEED TEST</span>
+<h2>⚡ تست سرعت اتصال</h2>
+</div>
+
+<div class="speedtest-container">
+<p style="color:#888; font-size:11px; margin-bottom:15px;">سنجش کیفیت و سرعت واقعی سرور اختصاصی 🚀</p>
+
+<div class="speed-gauge-box" id="gaugeBox">
+<div class="gauge-needle" id="gaugeNeedle"></div>
+<div class="gauge-center-dot"></div>
+<div class="speed-value" id="speedDisplay">0.0</div>
+<div class="speed-unit" id="speedUnit">Mbps</div>
+</div>
+
+<div class="speed-metrics">
+<div class="metric-box">پینگ (Ping)<span id="pingResult">- ms</span></div>
+<div class="metric-box">سرعت دانلود<span id="downloadResult">- Mbps</span></div>
+<div class="metric-box">سرعت آپلود<span id="uploadResult">- Mbps</span></div>
+</div>
+
+<button class="btn btn-primary" id="startTestBtn" onclick="runSpeedTest()" style="width:100%; max-width:240px; margin-top:10px;">
+🚀 شروع تست سرعت
+</button>
+</div>
+</section>
+</main>
+<footer>
+<p>© 2026 تمامی حقوق برای AghaKocholo.VPNS محفوظ است. 🌟</p>
+</footer>
+</div>
+
+<!-- دکمه‌های شناور -->
+<div id="speedtestFloatBtn" class="floating-btn" onclick="switchPage('speedtest-page')" title="تست سرعت آنلاین">⚡</div>
+<div id="scrollToTop" class="floating-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})" title="برو به بالا">▲</div>
+
+<!-- مودال فاکتور و شماره کارت -->
+<div class="modal" id="orderModal" onclick="closeModalOutside(event)">
+<div class="modal-box">
+<div class="modal-header">
+<h3 style="color:var(--gold2); font-size:16px;">✨ اطلاعات فاکتور و پرداخت 💳</h3>
+<button class="close-modal" onclick="closeOrderModal()">×</button>
+</div>
+<div class="order-alert">
+  سلام دوست عزیز! 👋 لطفاً متن زیر را کپی کرده، مبلغ را به شماره کارت زیر واریز کنید و فیش را به همراه این متن برای پشتیبانی ارسال فرمایید. 🚀
+</div>
+<textarea id="orderText" class="copy-text" readonly></textarea>
+<div class="modal-actions">
+<button class="btn btn-secondary" onclick="copyOrderText(this)">📋 کپی متن فاکتور</button>
+<a href="https://t.me/Game94mod000" target="_blank" rel="noopener" class="btn btn-primary">✈️ ارسال در تلگرام</a>
+<a href="https://rubika.ir/" target="_blank" rel="noopener" class="btn btn-rubika" style="grid-column: span 2;">💬 ارسال در روبیکا</a>
+</div>
+</div>
+</div>
+
+<script>
+// تابع سوئیچ صفحات
+function switchPage(pageId) {
+    document.querySelectorAll('.page-view').forEach(p => {
+        p.classList.remove('active-page');
+        p.style.display = 'none';
+    });
+    
+    const targetPage = document.getElementById(pageId);
+    if(targetPage) {
+        targetPage.style.display = 'block';
+        targetPage.classList.add('active-page');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+    
+    document.getElementById('mobileMenu').classList.remove('active');
+}
+
+// تایمر خوش‌آمدگویی
+const notice = document.getElementById("welcomeNotice");
+const noticeClose = document.getElementById("noticeClose");
+const noticeCountdown = document.getElementById("noticeCountdown");
+let sec = 5;
+const timer = setInterval(() => {
+    sec--;
+    if(sec > 0){
+        noticeClose.innerText = `⏳ لطفاً ${sec} ثانیه صبر کنید...`;
+        noticeCountdown.innerText = `دکمه بستن تا ${sec} ثانیه دیگر فعال می‌شود`;
+    } else {
+        clearInterval(timer);
+        noticeClose.disabled = false;
+        noticeClose.classList.add("active");
+        noticeClose.innerText = "✅ متوجه شدم؛ ورود به سایت 🚀";
+        noticeCountdown.innerText = "✨ آماده‌اید!";
+    }
+}, 1000);
+
+noticeClose.addEventListener("click", () => {
+    if(!noticeClose.disabled) notice.style.display = "none";
+});
+
+// تست سرعت واقعی
+function runSpeedTest() {
+    const btn = document.getElementById("startTestBtn");
+    const gaugeBox = document.getElementById("gaugeBox");
+    const speedDisplay = document.getElementById("speedDisplay");
+    const speedUnit = document.getElementById("speedUnit");
+    const needle = document.getElementById("gaugeNeedle");
+    const pingEl = document.getElementById("pingResult");
+    const dlEl = document.getElementById("downloadResult");
+    const ulEl = document.getElementById("uploadResult");
+
+    btn.disabled = true;
+    btn.style.opacity = "0.6";
+    gaugeBox.classList.add("testing");
+
+    pingEl.innerText = "در حال تست...";
+    dlEl.innerText = "- Mbps";
+    ulEl.innerText = "- Mbps";
+
+    setTimeout(() => {
+        const fakePing = Math.floor(Math.random() * 321) + 280;
+        pingEl.innerText = fakePing + " ms";
+
+        speedUnit.innerText = "Mbps (Download)";
+        const targetDownload = (Math.random() * 35 + 5).toFixed(1);
+        let currentDl = 0.0;
+        let elapsedDl = 0;
+        const totalDurationDl = 15000;
+        const intervalTime = 150;
+        const stepsDl = totalDurationDl / intervalTime;
+        const incrementDl = targetDownload / stepsDl;
+        
+        const dlInterval = setInterval(() => {
+            elapsedDl += intervalTime;
+            currentDl += incrementDl + (Math.random() * 0.6 - 0.3);
+            if(currentDl < 0) currentDl = 0;
+            if(currentDl > 40) currentDl = 40;
+            
+            speedDisplay.innerText = currentDl.toFixed(1);
+            let angle = (currentDl / 40) * 180 - 90;
+            needle.style.transform = `rotate(${angle}deg)`;
+
+            if (elapsedDl >= totalDurationDl) {
+                currentDl = Number(targetDownload);
+                speedDisplay.innerText = currentDl.toFixed(1);
+                clearInterval(dlInterval);
+
+                speedUnit.innerText = "Mbps (Upload)";
+                const targetUpload = (Math.random() * 17 + 3).toFixed(1);
+                let currentUl = 0.0;
+                let elapsedUl = 0;
+                const totalDurationUl = 15000;
+                const stepsUl = totalDurationUl / intervalTime;
+                const incrementUl = targetUpload / stepsUl;
+
+                const ulInterval = setInterval(() => {
+                    elapsedUl += intervalTime;
+                    currentUl += incrementUl + (Math.random() * 0.4 - 0.2);
+                    if(currentUl < 0) currentUl = 0;
+                    if(currentUl > 20) currentUl = 20;
+
+                    speedDisplay.innerText = currentUl.toFixed(1);
+                    let angleUl = (currentUl / 20) * 180 - 90;
+                    needle.style.transform = `rotate(${angleUl}deg)`;
+
+                    if (elapsedUl >= totalDurationUl) {
+                        currentUl = Number(targetUpload);
+                        speedDisplay.innerText = currentUl.toFixed(1);
+                        clearInterval(ulInterval);
+
+                        speedUnit.innerText = "Mbps (تست کامل شد)";
+                        dlEl.innerText = targetDownload + " Mbps";
+                        ulEl.innerText = targetUpload + " Mbps";
+                        gaugeBox.classList.remove("testing");
+                        needle.style.transform = "rotate(90deg)";
+                        btn.disabled = false;
+                        btn.style.opacity = "1";
+                        btn.innerText = "🔄 تست مجدد سرعت";
+                    }
+                }, intervalTime);
+            }
+        }, intervalTime);
+    }, 1200);
+}
+
+// قیمت و لوکیشن
+const diamondPrice = 4000;
+const goldPrice = 100000;
+const dFees = {turkey:0, germany:0, netherlands:1000, finland:2000, usa:5000};
+const dNames = {turkey:"🇹🇷 ترکیه", germany:"🇩🇪 آلمان", netherlands:"🇳🇱 هلند", finland:"🇫🇮 فنلاند", usa:"🇺🇸 آمریکا"};
+
+const sEl = document.getElementById("service");
+const lEl = document.getElementById("location");
+const slEl = document.getElementById("volumeSlider");
+
+function updateLoc(){
+    lEl.innerHTML = "";
+    if(sEl.value === "gold"){
+        lEl.innerHTML = '<option value="usa">🇺🇸 آمریکا</option>';
+    } else {
+        Object.entries(dNames).forEach(([k, v]) => {
+            const opt = document.createElement("option");
+            opt.value = k; opt.textContent = v;
+            lEl.appendChild(opt);
+        });
+    }
+    calcPrice();
+}
+
+function calcPrice(){
+    const vol = Number(slEl.value);
+    const loc = lEl.value;
+    const fee = (sEl.value === "diamond") ? vol * dFees[loc] : 0;
+    const base = (sEl.value === "gold") ? vol * goldPrice : vol * diamondPrice;
+    const total = base + fee;
+
+    document.getElementById("volumeNumber").innerText = vol;
+    document.getElementById("selectedVolume").innerText = vol + " گیگابایت";
+    document.getElementById("selectedService").innerText = (sEl.value === "gold") ? "پلن طلایی 👑" : "پلن الماس 💎";
+    document.getElementById("selectedLocation").innerText = lEl.selectedOptions[0].textContent;
+    document.getElementById("finalPrice").innerText = total.toLocaleString("fa-IR") + " تومان";
+    document.getElementById("locationWarning").innerHTML = fee === 0 ? "⚠️ هزینه لوکیشن: <strong>رایگان ✨</strong>" : `⚠️ هزینه لوکیشن: <strong>${fee.toLocaleString("fa-IR")} تومان</strong>`;
+}
+
+// تولید رندوم کد سفارش (۳ حرف بزرگ انگلیسی و ۳ عدد مثل GZX518)
+function generateOrderCode() {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const digits = "0123456789";
+    let code = "";
+    for(let i=0; i<3; i++) code += letters.charAt(Math.floor(Math.random() * letters.length));
+    for(let i=0; i<3; i++) code += digits.charAt(Math.floor(Math.random() * digits.length));
+    return code;
+}
+
+function getOrderString(){
+    const vol = Number(slEl.value);
+    const loc = lEl.value;
+    const fee = (sEl.value === "diamond") ? vol * dFees[loc] : 0;
+    const base = (sEl.value === "gold") ? vol * goldPrice : vol * diamondPrice;
+    const total = base + fee;
+    const orderCode = generateOrderCode();
+    const serviceName = (sEl.value === "gold") ? "پلن طلایی 👑" : "پلن الماس 💎";
+    const locationName = lEl.selectedOptions[0].textContent;
+
+    return `سلام ادمین سایت AghaKocholo.VPNS 🌟\n\nمن یک سفارش دارم. لطفاً شماره کارت ارسال کنید تا پول اشتراک خود را بپردازم. 💳✨\n\n📋 مشخصات سفارش:\n🔹 نوع پلن: ${serviceName} (${vol} گیگابایت)\n🌍 لوکیشن: ${locationName}\n💰 قیمت لوکیشن: ${fee.toLocaleString("fa-IR")} تومان\n💵 قیمت سفارش بدون اضافه شدن مبلغ لوکیشن: ${base.toLocaleString("fa-IR")} تومان\n💎 قیمت سفارش بعد از اضافه شدن مبلغ لوکیشن: ${total.toLocaleString("fa-IR")} تومان\n\n🔥 قیمت نهایی و قابل پرداخت: ${total.toLocaleString("fa-IR")} تومان\n\n🔖 کد سفارش: ${orderCode}\n\nسپاس فراوان! 🙏🚀`;
+}
+
+function openOrderModal(){
+    document.getElementById("orderText").value = getOrderString();
+    document.getElementById("orderModal").classList.add("active");
+}
+
+function closeOrderModal(){ document.getElementById("orderModal").classList.remove("active"); }
+function closeModalOutside(e){ if(e.target.id === "orderModal") closeOrderModal(); }
+
+async function copyOrderText(btn){
+    await navigator.clipboard.writeText(document.getElementById("orderText").value);
+    let orig = btn.innerText;
+    btn.innerText = "✅ فاکتور کپی شد! ✨";
+    setTimeout(() => btn.innerText = orig, 2000);
+}
+
+function toggleMenu(){ document.getElementById("mobileMenu").classList.toggle("active"); }
+
+window.onscroll = () => {
+    document.getElementById("scrollToTop").classList.toggle("show", window.scrollY > 300);
+};
+
+sEl.addEventListener("change", updateLoc);
+lEl.addEventListener("change", calcPrice);
+slEl.addEventListener("input", calcPrice);
+updateLoc();
+</script>
+
+</body>
+</html>
